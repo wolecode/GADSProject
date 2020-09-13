@@ -34,19 +34,12 @@ public class FragmentAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         Fragment frag;
         if(position==0){
-           Bundle bundle=new Bundle();
-           bundle.putParcelableArrayList(LearningFragment.LEADERS,topLearningLeaders);
 
            frag=new LearningFragment();
-           frag.setArguments(bundle);
 
         }
         else{
-            Bundle bundle=new Bundle();
-            bundle.putParcelableArrayList(IQFragment.LEADERS,topIQLeaders);
-
             frag=new IQFragment();
-            frag.setArguments(bundle);
         }
         return frag;
 

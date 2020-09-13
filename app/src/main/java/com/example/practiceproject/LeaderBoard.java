@@ -38,6 +38,7 @@ public class LeaderBoard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leader_board);
         submit=findViewById(R.id.submit);
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,56 +46,11 @@ public class LeaderBoard extends AppCompatActivity {
                 startActivityForResult(intent,0);
             }
         });
-        loadLearningAPI();
+
+        setViewPagerAndTabLayout();
     }
 
-
-    public void loadLearningAPI() {
-        ApiService service= RetrofitService.getApiService(ApiService.class);
-
-        /**
-          Getting list of Learning Leaders
-        * */
-        Call<List<LearningLeaders>> call=service.getLearningLeaders();
-        call.enqueue(new Callback<List<LearningLeaders>>() {
-            @Override
-            public void onResponse(Call<List<LearningLeaders>> call, Response<List<LearningLeaders>> response) {
-                mLearningLeaders= response.body();
-                loadIQAPI();
-
-            }
-
-            @Override
-            public void onFailure(Call<List<LearningLeaders>> call, Throwable t) {
-
-            }
-        });
-
-    }
-
-    private void loadIQAPI() {
-        ApiService service= RetrofitService.getApiService(ApiService.class);
-
-        /**
-         Getting list of IQ Leaders
-         */
-        Call<List<IQLeaders>> call1=service.getIQLeaders();
-        call1.enqueue(new Callback<List<IQLeaders>>() {
-            @Override
-            public void onResponse(Call<List<IQLeaders>> call, Response<List<IQLeaders>> response) {
-                mIqLeaders=response.body();
-                createViewPagerAndFragment();
-
-            }
-
-            @Override
-            public void onFailure(Call<List<IQLeaders>> call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void createViewPagerAndFragment() {
+    private void setViewPagerAndTabLayout() {
         fragment =new FragmentAdapter(LeaderBoard.this);
         viewPager=findViewById(R.id.viewPager);
         viewPager.setAdapter(fragment);

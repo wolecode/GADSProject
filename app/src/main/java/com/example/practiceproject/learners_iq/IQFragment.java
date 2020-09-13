@@ -6,9 +6,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +21,17 @@ import android.widget.TextView;
 import com.example.practiceproject.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class IQFragment extends Fragment {
-    public static String LEADERS="IQLeaders";
-    public RecyclerView IQRecycler;
-    public RecyclerView.LayoutManager layout;
+
+    private RecyclerView IQRecycler;
+    private RecyclerView.LayoutManager layout;
+    private List<IQLeaders> mLeadersList=new ArrayList<>();
+    private IQRecyclerAdapter adapt;
+    private IQViewModel model;
+    private View mView;
 
     public IQFragment() {
         // Required empty public constructor
@@ -34,66 +42,40 @@ public class IQFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_i_q, container, false);
+        mView= inflater.inflate(R.layout.fragment_i_q, container, false);
+        return  mView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle bundle=getArguments();
-        IQRecycler=view.findViewById(R.id.IQRecycler);
-        List<IQLeaders>leadersList= bundle.getParcelableArrayList(LEADERS);
 
-        IQRecyclerAdapter adapt=new IQRecyclerAdapter(leadersList,getContext());
+        model = new ViewModelProvider(getViewModelStore(),ViewModelProvider.AndroidViewModelFactory
+                .getInstance(getActivity().getApplication())).get(IQViewModel.class);
+
+        model.init();
+
+        model.leaders().observe(this, new Observer<List<IQLeaders>>() {
+             @Override
+             public void onChanged(List<IQLeaders> iqLeaders) {
+                 if(iqLeaders!=null){
+                 mLeadersList.addAll(iqLeaders);
+
+                 }
+               adapt.notifyDataSetChanged();
+             }
+         });
+
+        loadRecyclerView();
+
+    }
+
+    private void loadRecyclerView() {
+
+        IQRecycler = mView.findViewById(R.id.IQRecycler);
+        adapt = new IQRecyclerAdapter(mLeadersList, getContext());
         IQRecycler.setAdapter(adapt);
-        layout= new LinearLayoutManager(getContext());
+        layout = new LinearLayoutManager(getContext());
         IQRecycler.setLayoutManager(layout);
     }
-/*
-    public static class IQRecyclerAdapter extends RecyclerView.Adapter<IQRecyclerAdapter.Holder> {
-        public List<IQLeaders> leaders;
-        public Context context;
-
-        public IQRecyclerAdapter(List<IQLeaders> leaders, Context context){
-            this.leaders=leaders;
-            this.context=context;
-        }
-
-        public class Holder extends RecyclerView.ViewHolder{
-            public ImageView image;
-            public TextView name;
-            public TextView details;
-
-            public Holder(View view){
-                super(view);
-                image=view.findViewById(R.id.image);
-                name=view.findViewById(R.id.name);
-                details=view.findViewById(R.id.details);
-            }
-        }
-
-
-
-        @NonNull
-        @Override
-        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater inflate= LayoutInflater.from(parent.getContext());
-            View view=inflate.inflate(R.layout.adapter_layout,parent,false);
-            return new Holder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull Holder holder, int position) {
-            holder.name.setText(leaders.get(position).name);
-            holder.details.setText(leaders.get(position).score+" "+"Skill IQ score, "+ leaders.get(position).country);
-            Picasso.get()
-                    .load(leaders.get(position).badgeUrl)
-                    .into(holder.image);
-        }
-
-        @Override
-        public int getItemCount() {
-            return leaders.size();
-        }
-    }*/
 }

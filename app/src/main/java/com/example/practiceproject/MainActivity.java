@@ -22,8 +22,6 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     public ConnectivityManager connectManager;
-    public IntentFilter filter;
-    public ConnectivityReceiver receiver;
     public AlarmManager alarm;
     public PendingIntent pending;
     public ProgressBar progress;
